@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="../styles/admin.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+
+//@ignore
+  var p = <%=hall.length + recordsPerPage*(parseInt(pageNo)-1) +1%>;
+  $(document).ready(function(){
+  var actions = $("table td:last-child").html();
+  $(".add-new").click(function(){
+  var index = $("table tbody tr:last-child").index();
+  var row = `<tr id="row${p}">
+  <td id="sn${p}" name="sn${p}">${p}</td>
+  <td><input type="text" class="form-control" name="roomNo${p}" id="roomNo${p}"/></td>
+  <td><input type="text" class="form-control" name="deptName${p}" id="deptName${p}"/></td>
+  <td><input type="number" class="form-control" name="totalSeats${p}" id="totalSeats${p}"/></td>
+  <td><a class="delete" title="Delete" data-toggle="tooltip" id="delete${p}" name="delete${p++}"><i class="material-icons">&#xE872;</i></a></td>
+
+</tr>`
+  $("#table").append(row);
+  });
+
+  $(document).on("click", ".delete", function(){
+    let id= parseInt(this.id.slice(6));
+    --p;
+    if(p>1){
+    document.getElementById('roomNo'+id).value = document.getElementById('roomNo'+p).value;
+    document.getElementById('deptName'+id).value = document.getElementById('deptName'+p).value;
+    document.getElementById('totalSeats'+id).value = document.getElementById('totalSeats'+p).value;
+  }
+  document.getElementById('row'+p).remove();
+  });
+
+  });
+
+  function hasDuplicate(arr){
+    let d = {}
+  for(var i=0;i<arr.length;i++){
+    if(!d[arr[i]]) d[arr[i]]=1;
+    else return true;
+  }
+  return false;
+  }
+
+  function validateDetails(){
+  
+  let roomNo =[];
+  for(var x=1;x<p;x++){
+    let val=document.getElementById("roomNo"+x).value.trim();
+    if(val) roomNo.push(val);
+  }
+
+  if(hasDuplicate(roomNo)){
+    alert("Cannot save!\nWarning: Hall no has duplicate ID's")
+  }
+
+  for(var x=1;x<p;x++){
+    let hallNo = document.getElementById("roomNo"+x).value.trim();
+    let hallName = document.getElementById("deptName"+x).value.trim();
+    let totalSeats = document.getElementById("totalSeats"+x).value;
+    if(!(roomNo && deptName && totalSeats) && (roomNo || deptName || totalSeats)){
+      alert("Cannot Save!\nWarning: Null value found at row : "+x+" in Hall Details");
+      return false;
+    }
+  }
+
+  console.log("success");
+  return true;
+  }
+</script>
+</head>
+<body>
+  <div class="topnav">
+    <a  href="/admin/student">Student</a>
+    <a href="/admin/invigilator">Invigilator</a>
+    <a  href="/admin/course">Course</a>
+    <a class="active" href="/admin/hall">Hall</a>
+  </div>
+<form method="post" action="/saveDetails" onsubmit="return validateDetails(); ">
+  <input type="hidden" value="<%=pageNo%>" name="pageNo">
+  <input type="hidden" value="4" name="type">
+<div class="container">
+<div class="table-wrapper">
+<div class="table-title">
+<div class="row">
+<div class="col-sm-8"><h2><b>Hall Details</b></h2></div>
+<div class="col-sm-4">
+<button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+</div>
+</div>
+</div>
+<table class="table table-bordered" id="table">
+<thead>
+<tr>
+<th>S.No</th>
+<th>Room No</th>
+<th>Dept Name</th>
+<th>Total seats</th>
+<th>A</th>
+</tr>
+</thead> 
+<tbody>
+<%
+let l=1+recordsPerPage*(parseInt(pageNo)-1);
+for(val of hall){%>
+<tr id="row<%=l%>">
+  <td id="sn<%=l%>" name="sn<%=l%>"><%=l%></td>
+  <td><input type="text" class="form-control" name="roomNo<%=l%>" id="roomNo<%=l%>" value="<%=val.roomNo%>"/></td>
+  <td><input type="text" class="form-control" name="deptName<%=l%>" id="deptName<%=l%>" value="<%=val.deptName%>"/></td>
+  <td><input type="number" class="form-control" name="totalSeats<%=l%>" id="totalSeats<%=l%>" value="<%=val.totalSeats%>"/></td>
+  <td><a class="delete" title="Delete" data-toggle="tooltip" id="delete<%=l%>" name="delete<%=l++%>"><i class="material-icons">&#xE872;</i></a></td>
+</tr>
+<%}%>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div style="text-align: center; margin: auto">
+  <%if(prevFlag){%>
+  <button type="submit" style=" padding-right: 20px; padding-left: 20px; margin-right: 20px;" class="btn" formaction="/prev">Prev</button>
+  <%}%>
+  <button type="submit" style=" padding-right: 20px; <%if(!prevFlag){%> margin-left: 20px; <%}%> padding-left: 20px; margin-right: 20px;" class="btn">Save</button>
+  <%if(nextFlag){%>
+  <button type="submit" style=" padding-right: 20px; padding-left: 20px; margin-right: 20px;" class="btn" formaction="/next"  >Next</button>
+  <%}%>
+  </div>
+
+  <div style="text-align: center; margin: auto; padding-top: 20px;" >
+  <button type="submit" formaction="/publish" class="btn" style="margin-right: 20px;">Publish</button>
+  <button type="submit" formaction="/logout" class="btn" style="color:white; background-color: red;">Logout</button>
+</div>
+
+</form>
+</body>
+</html> 

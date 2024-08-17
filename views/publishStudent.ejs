@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles/publish.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+
+  <%if(published){%>
+    <form>
+      <div class="container">
+        <div class="table-wrapper">
+          <div class="table-title">
+            <div class="row">
+              <div class="col-sm-8">
+                <h2><b>Student Details</b></h2>
+              </div>
+              <div class="col-sm-4">
+              </div>
+            </div>
+          </div>
+          <table class="table table-bordered" id="table5">
+            <thead>
+              <tr>
+                <th>Enrollment Id</th>
+                <th>Name</th>
+                <th>Room No</th>
+                <th>Dept Name</th>
+                <th>Seat Number</th>
+                <th>Subject Code</th>
+                <th>Exam Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(val of pstudent){%>
+                <tr>
+                  <td>
+                    <%=val.enrollmentId%>
+                  </td>
+                  <td>
+                    <%=val.name%>
+                  </td>
+                  <td>
+                    <%=val.roomNo%>
+                  </td>
+                  <td>
+                    <%=val.deptName%>
+                  </td>
+                  <td>
+                    <%=val.seatNo%>
+                  </td>
+                  <td>
+                    <%=val.subjectCode%>
+                  </td>
+                  <td>
+                    <%=val.examDate%>
+                  </td>
+                </tr>
+                <%}%>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+
+      <input type="hidden" name="type" value="5">
+      <input type="hidden" name="pageNo" value="<%=pageNo%>">
+      <div style="text-align: center; margin: auto">
+        <%if(prevFlag){%>
+          <button type="submit" style=" padding-right: 20px; padding-left: 20px; margin-right: 20px;" class="btn"
+            formaction="/prev" formmethod="post">Prev</button>
+          <%}%>
+            <%if(nextFlag){%>
+              <button type="submit" style=" padding-right: 20px; padding-left: 20px; margin-right: 20px;" class="btn"
+                formaction="/next" formmethod="post">Next</button>
+              <%}%>
+      </div>
+
+
+      <div style="text-align: center; margin: auto; padding-top: 20px;">
+        <button type="submit" formaction="/unpublish" formmethod="get" class="btn"
+          style="margin-right: 20px;">Unpublish</button>
+        <button type="submit" formaction="/logout" class="btn" formmethod="get"
+          style="color:white; background-color: red;">Logout</button>
+      </div>
+    </form>
+    <%} else{%>
+      <div class="topnav">
+        <a href="/admin/student">Student</a>
+        <a href="/admin/invigilator">Invigilator</a>
+        <a href="/admin/course">Course</a>
+        <a href="/admin/hall">Hall</a>
+      </div>
+      <div class="container">
+        <div class="table-wrapper">
+          <p>Nothing is published yet!!!.</p>
+        </div>
+        <button type="submit" formmethod="POST" formaction="/logout" class="btn"
+          style="color:white; background-color: red;">Logout</button>
+      </div>
+      <%}%>
+
+
+</body>
+
+</html>

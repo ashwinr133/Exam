@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="../styles/admin.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+
+//@ignore
+  var m = <%=invigilator.length + recordsPerPage*(parseInt(pageNo)-1) +1%>;
+
+  $(document).ready(function(){
+  var actions = $("table td:last-child").html();
+//add new for invigilator
+  $(".add-new").click(function(){
+  var index = $("table tbody tr:last-child").index();
+  var row = `<tr id="row${m}">
+  <td id="sn${m}" name="sn${m}">${m}</td>
+  <td><input type="text" class="form-control" name="staffId${m}" id="staffId${m}"/></td>
+  <td><input type="text" class="form-control" name="iname${m}" id="iname${m}"/></td>
+  <td><input type="text" class="form-control" name="password${m}" id="password${m}"/></td> 
+  <td><a class="delete" title="Delete" data-toggle="tooltip" id="delete${m}" name="delete${m++}"><i class="material-icons">&#xE872;</i></a></td>
+
+</tr>`
+  $("#table").append(row);
+
+  });
+  $(document).on("click", ".delete", function(){
+    let id= parseInt(this.id.slice(6));
+    --m;
+    if(m>1){
+    document.getElementById('staffId'+id).value = document.getElementById('staffId'+m).value;
+    document.getElementById('iname'+id).value = document.getElementById('iname'+m).value;
+    document.getElementById('password'+id).value = document.getElementById('password'+m).value;
+  }
+  document.getElementById('row'+m).remove();
+  });
+  });
+
+  function hasDuplicate(arr){
+    let d = {}
+  for(var i=0;i<arr.length;i++){
+    if(!d[arr[i]]) d[arr[i]]=1;
+    else return true;
+  }
+  return false;
+  }
+
+  function validateDetails(){
+  let staffID =[];
+  for(var x=1;x<m;x++){
+    let val=document.getElementById("staffId"+x).value.trim();
+    if(val) staffID.push(val);
+  }
+
+  if(hasDuplicate(staffID)){
+    alert("Cannot save!\nWarning: Staff has duplicate ID's")
+  }
+
+  console.log("success");
+  return true;
+  }
+</script>
+</head>
+<body>
+
+  <div class="topnav" >
+    <a  href="/admin/student">Student</a>
+    <a class="active" href="/admin/invigilator">Invigilator</a>
+    <a  href="/admin/course">Course</a>
+    <a href="/admin/hall">Hall</a>
+  </div>
+<form method="post" action="/saveDetails" onsubmit="return validateDetails(); ">
+  <input type="hidden" value="<%=pageNo%>" name="pageNo">
+  <input type="hidden" value="2" name="type">
+<div class="container">
+<div class="table-wrapper">
+<div class="table-title">
+<div class="row">
+<div class="col-sm-8"><h2><b>Invigilator Details</b></h2></div>
+<div class="col-sm-4">
+<button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+</div>
+</div>
+</div>
+<table class="table table-bordered" id="table">
+<thead>
+<tr>
+<th>S.No</th>
+<th>Staff ID</th>
+<th>Name</th>
+<th>Password</th>
+<th>A</th>
+</tr>
+</thead> 
+<tbody>
+<%
+let j=1+recordsPerPage*(parseInt(pageNo)-1);
+for(val of invigilator){%>
+<tr id="row<%=j%>">
+  <td id="sn<%=j%>" name="sn<%=j%>"><%=j%></td>
+  <td><input type="text" class="form-control" name="staffId<%=j%>" id="staffId<%=j%>" value="<%=val.staffId%>"/></td>
+  <td><input type="text" class="form-control" name="iname<%=j%>" id="iname<%=j%>" value="<%=val.name%>"/></td>
+  <td><input type="text" class="form-control" name="password<%=j%>" id="password<%=j%>" value="<%=val.password%>"/></td>
+  <td><a class="delete" title="Delete" data-toggle="tooltip" id="delete<%=j%>" name="delete<%=j++%>"><i class="material-icons">&#xE872;</i></a></td>
+</tr>
+<%}%>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div style="text-align: center; margin: auto">
+  <%if(prevFlag){%>
+  <button type="submit" style=" padding-right: 20px; padding-left: 20px; margin-right: 20px;" class="btn" formaction="/prev">Prev</button>
+  <%}%>
+  <button type="submit" style=" padding-right: 20px; <%if(!prevFlag){%> margin-left: 20px; <%}%> padding-left: 20px; margin-right: 20px;" class="btn">Save</button>
+  <%if(nextFlag){%>
+  <button type="submit" style=" padding-right: 20px; padding-left: 20px; margin-right: 20px;" class="btn" formaction="/next"  >Next</button>
+  <%}%>
+  </div>
+
+  <div style="text-align: center; margin: auto; padding-top: 20px;" >
+  <button type="submit" formaction="/publish" class="btn" style="margin-right: 20px;">Publish</button>
+  <button type="submit" formaction="/logout" class="btn" style="color:white; background-color: red;">Logout</button>
+</div>
+</form>
+</body>
+</html> 
